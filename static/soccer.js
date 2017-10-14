@@ -22,4 +22,12 @@ $(function(){
         })
         sel(1,"away")
     })
+    $("#btn_predict").click(function(){
+        $("#btn_predict").hide()
+        $("#h1_score").show()
+    })
+    $("#h1_score").click(function(){
+        $("#h1_score").hide()
+        $("#btn_predict").show()
+    })
 })
