@@ -7,7 +7,7 @@ function ddl(rs, k, v){
 }
 function sel(league,target){
     $.getJSON("/team/league/"+league, function( teams ) {
-        $("#ddl_team_"+target).html(ddl(teams, 0, 1))
+        $("#ddl_team_"+target).html(ddl(teams, 1, 3))
     })
 }
 
