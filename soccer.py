@@ -41,3 +41,9 @@ def player_team(teamX, teamY):
     print("sql:" + sql)
     c.execute(sql)
     return json.dumps(c.fetchall())
+
+if __name__ == "__main__":
+    app.run()
+    
+
+
