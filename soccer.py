@@ -35,8 +35,8 @@ def team_league(id):
 def player_team(teamX, teamY):
     c = conn.cursor()
     sql = "select {0}, {1} from match where (home_team_api_id = {2} and away_team_api_id = {3}) or (home_team_api_id = {3} and away_team_api_id = {2});".format(
-        ",".join(map((lambda i: "home_player_%s" % i), range(1, 11))),
-        ",".join(map((lambda i: "away_player_%s" % i), range(1, 11))),
+        ",".join(map((lambda i: "home_player_%s" % i), range(1, 12))),
+        ",".join(map((lambda i: "away_player_%s" % i), range(1, 12))),
         teamX, teamY)
     print("sql:" + sql)
     c.execute(sql)
@@ -44,6 +44,6 @@ def player_team(teamX, teamY):
 
 if __name__ == "__main__":
     app.run()
-    
+
 
 
