@@ -5,7 +5,7 @@ from sklearn.utils import shuffle
 from sklearn.model_selection import train_test_split
 
 from odds_data import getOddsDataForSpanish,getTeamsPower,getOddsHistoryByTeam
-from model_helper import predictBySVM,predictByLR,predictGAP,result_accuracy
+from model_helper import predictBySVM,predictByARDRegression,predictByLR,predictGAP,result_accuracy
 
 def predictOdds(team1_id,team2_id):
 
@@ -24,13 +24,30 @@ def predictOdds(team1_id,team2_id):
 
     team_data = getTeamsPower(team1_id,team2_id)
 
-    y1 = predictBySVM(X_train_win,team_data,y_train_win)
-    y2 = predictBySVM(X_train_draw,team_data,y_train_draw)
-    y3 = predictBySVM(X_train_lose,team_data,y_train_lose)
+    #Predict using SVM
+    a_y1 = predictBySVM(X_train_win,team_data,y_train_win)
+    a_y2 = predictBySVM(X_train_draw,team_data,y_train_draw)
+    a_y3 = predictBySVM(X_train_lose,team_data,y_train_lose)
+
+    #Predict using ARD_Regression
+    b_y1 = predictByARDRegression(X_train_win,team_data,y_train_win)
+    b_y2 = predictByARDRegression(X_train_draw,team_data,y_train_draw)
+    b_y3 = predictByARDRegression(X_train_lose,team_data,y_train_lose)
+
+    #Ensemble model using voting with corresponding accuracy weight
+    y1 = (a_y1*1 + b_y1*0)/1
+    y2 = (a_y2*1 + b_y2*0)/1
+    y3 = (a_y3*2 + b_y3*1)/3
+
+    #Gambling Strategy
+    if y2 - y1 > y1*0.7:
+        y2 = y2*2.5
+        y3 = y3*3.5
+
     print("----------------------")
-    print("SVM Win  = %.3f" % y1)
-    print("SVM Draw = %.3f" % y2)
-    print("SVM Lose = %.3f" % y3)
+    print("Win  = %.3f" % y1)
+    print("Draw = %.3f" % y2)
+    print("Lose = %.3f" % y3)
     print("----------------------")
 
     getOddsHistoryByTeam(team1_id,team2_id)
@@ -48,11 +65,24 @@ def predictOdds(team1_id,team2_id):
     print("SVM Draw Accuracy = %.3f" % result_accuracy(y_gap_draw, 0.6))
     print("SVM Lose Accuracy = %.3f" % result_accuracy(y_gap_lose, 1.5))
 
+    #Predict using Linear Regression model
+    y_test_predict_win  = predictByARDRegression(X_train_win,X_test_win,y_train_win)
+    y_test_predict_draw = predictByARDRegression(X_train_draw,X_test_draw,y_train_draw)
+    y_test_predict_lose = predictByARDRegression(X_train_lose,X_test_lose,y_train_lose)
+
+    y_gap_win = predictGAP(y_test_predict_win,y_test_win)
+    y_gap_draw = predictGAP(y_test_predict_draw,y_test_draw)
+    y_gap_lose = predictGAP(y_test_predict_lose,y_test_lose)
+
+    print("LR Win  Accuracy = %.3f" % result_accuracy(y_gap_win, 0.4))
+    print("LR Draw Accuracy = %.3f" % result_accuracy(y_gap_draw, 0.6))
+    print("LR Lose Accuracy = %.3f" % result_accuracy(y_gap_lose, 1.5))
+
     predict_result = [y1,y2,y3]
     return predict_result
 
 if __name__ == '__main__':
-    predictOdds("8634","10205")
+    predictOdds("9864","8306")
 
 
 

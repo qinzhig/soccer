@@ -12,6 +12,16 @@ def predictBySVM(x_train,x_test,y_train):
 
     return y_predict
 
+
+#Linear Regression build Model
+def predictByARDRegression(x_train,x_test,y_train):
+
+    model = linear_model.ARDRegression()
+    model.fit(x_train,y_train.values.ravel())
+    y_predict = model.predict(x_test)
+
+    return y_predict
+
 #Linear Regression build Model
 def predictByLR(x_train,x_test,y_train):
 
