@@ -1,9 +1,5 @@
 import sqlite3
 import pandas as pd
-from sklearn import svm
-from sklearn.utils import shuffle
-from sklearn.model_selection import train_test_split
-from sklearn import linear_model
 import numpy as np
 from pandas import Series, DataFrame
 
