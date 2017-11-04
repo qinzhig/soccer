@@ -3,6 +3,49 @@ import pandas as pd
 import numpy as np
 from pandas import Series, DataFrame
 
+def getOddsHistoryByTeam(team1_id,team2_id):
+    db_con = sqlite3.connect("database.sqlite")
+    Liga_match_history = pd.read_sql_query("select season,home_team_api_id,away_team_api_id,B365H,B365D,B365A from Match where home_team_api_id= " + team1_id + " and away_team_api_id= " + team2_id,db_con)
+    season_list = ['2015/2016']
+    Liga_match_history = Liga_match_history[Liga_match_history.season.isin(season_list)]
+
+    print("---------------History---------------------")
+    print(Liga_match_history)
+    print("---------------History---------------------")
+
+def getTeamsPower(team1_id,team2_id):
+
+    spanish_liga_2016_team_id = ['8315','9906','8634','9910','9783','8372','8558','8305','7878','8306','8581','9864','8370','8603','8633','8560','8302','9869','10267','10205']
+
+    db_con = sqlite3.connect("database.sqlite")
+    teams_prop = pd.read_sql_query("SELECT team_api_id, date,buildUpPlaySpeed,chanceCreationShooting,defenceAggression from Team_Attributes", db_con)
+    teams_prop =teams_prop[teams_prop.team_api_id.isin(spanish_liga_2016_team_id)]
+    date_list = ['2015-09-10 00:00:00']
+    teams_prop = teams_prop[teams_prop.date.isin(date_list)]
+
+    id_tmp = teams_prop[['team_api_id']]
+    prop_tmp = teams_prop[['buildUpPlaySpeed','chanceCreationShooting','defenceAggression']]
+
+    prop_tmp = prop_tmp.copy()
+    prop_tmp['power']  = prop_tmp.apply(lambda x: x.sum(), axis=1)
+    prop_tmp = prop_tmp.apply(lambda x: (x - x.min()) / (x.max() - x.min()))
+
+    teams_prop = prop_tmp.assign(team_api_id=id_tmp)
+
+    team1 = [team1_id]
+    team2 = [team2_id]
+
+    team1_prop = teams_prop[teams_prop.team_api_id.isin(team1)]
+    team2_prop = teams_prop[teams_prop.team_api_id.isin(team2)]
+
+    frames = [team1_prop,team2_prop]
+    new_df = pd.concat(frames)
+
+    result = new_df[['power']]
+    result = result.T
+
+    return result
+
 
 def getOddsDataForSpanish():
 
@@ -65,9 +108,10 @@ def getOddsDataForSpanish():
     teams_prop = teams_prop[teams_prop.date.isin(date_list)]
 
     teams_prop = teams_prop.merge(spain_teams, left_on="team_api_id", right_on="team_api_id", suffixes=('', '_t'))
-    teams_prop = teams_prop[['team_short_name','buildUpPlaySpeed','chanceCreationPassing','chanceCreationCrossing','chanceCreationShooting', 'defencePressure','defenceAggression','defenceTeamWidth']]
+    teams_prop = teams_prop[['team_api_id','team_short_name','buildUpPlaySpeed','chanceCreationPassing','chanceCreationCrossing','chanceCreationShooting', 'defencePressure','defenceAggression','defenceTeamWidth']]
 
     teams_prop['power'] = teams_prop['buildUpPlaySpeed'] +teams_prop['chanceCreationShooting'] + teams_prop['defenceAggression']
+    #print(teams_prop)
 
     #Data concating
     matches_win = matches_win.merge(teams_prop, left_on="team_short_name", right_on="team_short_name", suffixes=('', '_t'))
