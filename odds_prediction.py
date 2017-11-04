@@ -20,9 +20,9 @@ def predictOdds():
     y_draw = merged_data[['mean_draw']]
     y_lose = merged_data[['mean_lose']]
 
-    X_train_win, X_test_win, y_train_win, y_test_win = train_test_split(X, y_win, test_size=0.2)
-    X_train_draw, X_test_draw, y_train_draw, y_test_draw = train_test_split(X, y_draw, test_size=0.2)
-    X_train_lose, X_test_lose, y_train_lose, y_test_lose = train_test_split(X, y_lose, test_size=0.2)
+    X_train_win, X_test_win, y_train_win, y_test_win = train_test_split(X, y_win, test_size=0.4)
+    X_train_draw, X_test_draw, y_train_draw, y_test_draw = train_test_split(X, y_draw, test_size=0.4)
+    X_train_lose, X_test_lose, y_train_lose, y_test_lose = train_test_split(X, y_lose, test_size=0.4)
 
     #Predict using SVM model
     y_test_predict_win = predictBySVM(X_train_win,X_test_win,y_train_win)
@@ -33,7 +33,7 @@ def predictOdds():
     y_gap_draw = predictGAP(y_test_predict_draw,y_test_draw)
     y_gap_lose = predictGAP(y_test_predict_lose,y_test_lose)
 
-    print("SVM Win Accuracy = %.3f" % result_accuracy(y_gap_win, 0.4))
+    print("SVM Win  Accuracy = %.3f" % result_accuracy(y_gap_win, 0.4))
     print("SVM Draw Accuracy = %.3f" % result_accuracy(y_gap_draw, 0.6))
     print("SVM Lose Accuracy = %.3f" % result_accuracy(y_gap_lose, 1.2))
 
@@ -46,7 +46,7 @@ def predictBySVM(x_train,x_test,y_train):
 
     return y_predict
 
-#SVM build Model
+#Linear Regression build Model
 def predictByLR(x_train,x_test,y_train):
 
     model = linear_model.LinearRegression()
