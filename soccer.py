@@ -91,5 +91,35 @@ def match():
     return json.dumps(xs)
 
 
+@app.route('/player')
+def player():
+    c = conn.cursor()
+    columns = "player_fifa_api_id,player_api_id,date,overall_rating,potential,preferred_foot,attacking_work_rate,defensive_work_rate,crossing,finishing,heading_accuracy,short_passing,volleys,dribbling,curve,free_kick_accuracy,long_passing,ball_control,acceleration,sprint_speed,agility,reactions,balance,shot_power,jumping,stamina,strength,long_shots,aggression,interceptions,positioning,vision,penalties,marking,standing_tackle,sliding_tackle,gk_diving,gk_handling,gk_kicking,gk_positioning,gk_reflexes"
+    sql = "select * from Player_Attributes where {0} and {1} and id in (select id from Player_Attributes group by player_api_id having max(date)=date);".format(
+        " and ".join(map((lambda i: "%s is not null" % i), columns.split(","))),
+        ' preferred_foot in ("left","right") and attacking_work_rate in ("low","medium","high") and defensive_work_rate in ("low","medium","high")'
+    )
+
+    print("sql:" + sql)
+    c.execute(sql)
+    ps = c.fetchall()
+    xs = []
+    foot = {
+        "left": 0,
+        "right": 1
+    }
+    level = {
+        "low": 0,
+        "medium": 1,
+        "high": 2
+    }
+    for p in ps:
+        x = list(p)
+        x[6] = foot[p[6]]
+        x[7] = level[p[7]]
+        x[8] = level[p[8]]
+        xs.append(x)
+    return json.dumps(xs)
+
 if __name__ == "__main__":
     app.run()
