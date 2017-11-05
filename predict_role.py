@@ -88,7 +88,7 @@ pd.value_counts(predicted)
 
 """
 def predict_role(ps):
-	fd = pd.read_csv('/Users/apple/Desktop/player_label.csv')
+	fd = pd.read_csv('player_label.csv')
 
 	df_obj = fd.label
 	fd.label = df_obj.apply(lambda x: str(x).strip())
