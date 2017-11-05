@@ -57,7 +57,7 @@ def getOddsDataForSpanish():
     # search in the Team table to filter out all the teams belong to Spain League
     teams = pd.read_sql_query("SELECT team_api_id,team_long_name,team_short_name from Team", db_con)
     spain_teams = teams[teams.team_api_id.isin(spain_league_team_id.home_team_api_id)]
-    # print(spain_teams)
+    #print(spain_teams)
 
     spain_teams_2016 = ['REA', 'BAR', 'AMA', 'SEV', 'VAL', 'VIL', 'SOC', 'BIL', 'ESP', 'BET', 'LEV', 'CEL', 'GET', 'COR','EIB', 'MAL', 'LAS', 'GRA', 'SPG', 'RAY']
 
