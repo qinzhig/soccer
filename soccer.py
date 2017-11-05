@@ -42,8 +42,14 @@ def player_team(teamX, teamY):
     c.execute(sql)
     return json.dumps(c.fetchall())
 
+
+@app.route('/predict/<int:teamX>-<int:teamY>')
+def predict(teamX, teamY):
+    data = {
+        "score":  "%s : %s" % (teamX, teamY)
+    }
+    return json.dumps(data)
+
+
 if __name__ == "__main__":
     app.run()
-
-
-
