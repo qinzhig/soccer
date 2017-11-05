@@ -46,11 +46,14 @@ def player_team(teamX, teamY):
 
 @app.route('/predict/<int:teamX>-<int:teamY>')
 def predict(teamX, teamY):
-    result = predictOdds(teamX,teamY)
-    
-    data = {
-        "score":  result
-    }
+    if teamX == teamY:
+        data = {
+            "score":  [0, 1, 0]
+        }
+    else:
+        data = {
+            "score":  predictOdds(teamX,teamY)
+        }
     return json.dumps(data)
 
 

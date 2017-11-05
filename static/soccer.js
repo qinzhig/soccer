@@ -11,6 +11,15 @@ function sel(league, target) {
     })
 }
 
+function clean(){
+    $("#btn_predict").hide()
+    $("#score").show()
+
+    $("#win").html("")
+    $("#draw").html("")
+    $("#lose").html("")
+}
+
 $(function () {
     $.getJSON("/q/league", function (leagues) {
         $("#ddl_league_home").html(ddl(leagues, 0, 2)).change(function () {
@@ -26,14 +35,17 @@ $(function () {
         var home = $("#ddl_team_home").val()
         var away = $("#ddl_team_away").val()
 
-        $("#btn_predict").hide()
+        clean()
+
         $.getJSON("/predict/" + home + "-" + away, function (data) {
-            $("#h1_score").show(data.score)
+            $("#win").html(data.score[0].toFixed(2))
+            $("#draw").html(data.score[1].toFixed(2))
+            $("#lose").html(data.score[2].toFixed(2))
         })
 
     })
-    $("#h1_score").click(function () {
-        $("#h1_score").hide()
+    $("#score").click(function () {
+        $("#score").hide()
         $("#btn_predict").show()
     })
 })

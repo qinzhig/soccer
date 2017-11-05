@@ -39,15 +39,25 @@
             margin: 0 auto;
         }
 
-        #h1_score {
+        #score {
             display: none;
+            background: transparent;
+            color: #fff;
+            margin: 0;
+        }
+
+        #score tr {
+            line-height: 10px;
+        }
+        #score td {
+            padding: 8px;
         }
     </style>
 </head>
 
 <body>
 
-    <table id="tab_teams" class="table">
+    <table id="tab_teams" class="table" border="0">
         <tr>
             <td style="text-align:left; width:260px;">
                 <select id="ddl_league_home"></select>
@@ -55,9 +65,18 @@
             </td>
             <td style="text-align:center;">
                 <button id="btn_predict" class="btn btn-primary btn-lg">Predict</button>
-                <h1 id="h1_score">
-                    <span class="badge badge-dark">0 : 0</span>
-                </h1>
+                <table id="score" border="0" class="table">
+                    <tr>
+                        <td>Win</td>
+                        <td>Draw</td>
+                        <td>Lose</td>
+                    </tr>
+                    <tr>
+                        <td id="win"></td>
+                        <td id="draw"></td>
+                        <td id="lose"></td>
+                    </tr>
+                </table>
             </td>
             <td style="text-align:right;width:260px;">
                 <select id="ddl_league_away"></select>
