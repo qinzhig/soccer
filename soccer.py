@@ -117,7 +117,7 @@ def match():
         for i in range(1, 23):
             if d[m[i]] is None:
                 break
-            x.append(d[m[i]])
+            x[i]= d[m[i]]
         else:
             xs.append(x)
     return json.dumps(xs)
