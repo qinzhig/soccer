@@ -8,6 +8,7 @@ from odds_prediction import predictOdds
 from score_prediction import predictScore
 from predict_role import predict_role
 from gap_prediction import predictGap
+from score_prediction import predictScore
 
 app = Flask(__name__, static_url_path='/static')
 conn = sqlite3.connect('database.sqlite')
@@ -152,6 +153,7 @@ def predict(teamX, teamY):
             "odds":  odds
         }
     data["gap"] = predictGap(teamX,teamY,odds+tps[0]+tps[1])
+    data["score"] = predictScore(teamX,teamY)
     return json.dumps(data)
 
 @app.route('/match')
