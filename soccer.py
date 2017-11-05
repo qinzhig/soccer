@@ -4,6 +4,7 @@ import json
 import sqlite3
 from flask import Flask
 from odds_prediction import predictOdds
+from score_prediction import predictScore
 
 app = Flask(__name__, static_url_path='/static')
 conn = sqlite3.connect('database.sqlite')
