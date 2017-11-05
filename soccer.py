@@ -5,6 +5,7 @@ import sqlite3
 from collections import Counter
 from flask import Flask
 from odds_prediction import predictOdds
+from score_prediction import predictScore
 from predict_role import predict_role
 
 app = Flask(__name__, static_url_path='/static')
