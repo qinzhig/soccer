@@ -6,10 +6,10 @@ from classifier_helper import predictByMultinomialNB, predictByDecisionTree, pre
 
 def predictGap(team1_id, team2_id, predicted):
     #TrainSet
-    x_train,x_test, y_train, y_test = train_test_split(train_set, test_set, test_size=0.33, random_state=12)
+    #x_train,x_test, y_train, y_test = train_test_split(train_set, test_set, test_size=0.33, random_state=12)
 
-    xs = getMatchHistory()
-    print(xs)
+    #xs = getMatchHistory()
+    #print(xs)
 
     predict_gap = 0
     return predict_gap

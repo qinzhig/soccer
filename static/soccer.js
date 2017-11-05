@@ -38,9 +38,9 @@ $(function () {
         clean()
 
         $.getJSON("/predict/" + home + "-" + away, function (data) {
-            $("#win").html(data.score[0].toFixed(2))
-            $("#draw").html(data.score[1].toFixed(2))
-            $("#lose").html(data.score[2].toFixed(2))
+            $("#win").html(data.odds[0].toFixed(2))
+            $("#draw").html(data.odds[1].toFixed(2))
+            $("#lose").html(data.odds[2].toFixed(2))
         })
 
         $.getJSON("/player/team/" + home + "-" + away, function (data) {
