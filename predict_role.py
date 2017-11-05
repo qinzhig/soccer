@@ -120,7 +120,7 @@ def predict_role(ps):
 
 	from sklearn import tree
 	clf_tree = tree.DecisionTreeClassifier().fit(x_train, y_train)
-	predicted = clf.predict(x_test)
+	predicted = clf_tree.predict(x_test)
 	print("#################### Decision Tree ######################")
 	print(metrics.confusion_matrix(y_test, predicted))
 	print(metrics.accuracy_score(y_test,predicted))
