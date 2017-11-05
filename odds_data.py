@@ -3,6 +3,10 @@ import pandas as pd
 import numpy as np
 from pandas import Series, DataFrame
 
+#@Author:   Qin Zhi Guo
+#@Version:  1.0
+
+#@Description: Function for show up the odds history for 2 team
 def getOddsHistoryByTeam(team1_id,team2_id):
     db_con = sqlite3.connect("database.sqlite")
     Liga_match_history = pd.read_sql_query("select season,home_team_api_id,away_team_api_id,B365H,B365D,B365A from Match where home_team_api_id= %s  and away_team_api_id= %s"  % (team1_id,team2_id), db_con)
@@ -13,6 +17,7 @@ def getOddsHistoryByTeam(team1_id,team2_id):
     print(Liga_match_history)
     print("---------------History---------------------")
 
+#@Description: Function for return the team power by team_api_id
 def getTeamsPower(team1_id,team2_id):
 
     spanish_liga_2016_team_id = ['8315','9906','8634','9910','9783','8372','8558','8305','7878','8306','8581','9864','8370','8603','8633','8560','8302','9869','10267','10205']
@@ -46,7 +51,7 @@ def getTeamsPower(team1_id,team2_id):
 
     return result
 
-
+#@Description: Function for show up the Spanish League Team data details
 def getOddsDataForSpanish():
 
     db_con = sqlite3.connect("database.sqlite")

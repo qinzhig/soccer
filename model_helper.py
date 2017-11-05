@@ -3,6 +3,9 @@ import pandas as pd
 from sklearn import svm
 from sklearn import linear_model
 
+#@Author:   Qin Zhi Guo
+#@Version:  1.0
+
 #SVM build Model
 def predictBySVM(x_train,x_test,y_train):
 
