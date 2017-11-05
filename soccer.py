@@ -5,6 +5,7 @@ import sqlite3
 from collections import Counter
 from flask import Flask
 from odds_prediction import predictOdds
+from predict_role import predict_role
 
 app = Flask(__name__, static_url_path='/static')
 conn = sqlite3.connect('database.sqlite')
@@ -83,7 +84,7 @@ def player_team(teamX, teamY):
             x[7] = level[p[7]]
             x[8] = level[p[8]]
             xs.append(x)
-        tps.append(xs)
+        tps.append(predict_role(xs))
     return json.dumps(tps)
 
 
