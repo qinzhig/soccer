@@ -8,11 +8,14 @@ from sklearn.model_selection import train_test_split
 from odds_data import getOddsDataForSpanish,getTeamsPower,getOddsHistoryByTeam
 from model_helper import predictBySVM,predictByARDRegression,predictByLR,predictGAP,result_accuracy
 
+#@Author:   Qin Zhi Guo
+#@Version:  1.0
+#@Description: Function for predicting 2 teams betting odds result: win/draw/lose
 def predictOdds(team1_id,team2_id):
 
     merged_data = getOddsDataForSpanish()
     #Shuffle and Slice Data for feeding the model
-    merged_data = shuffle(merged_data)
+    #merged_data = shuffle(merged_data)
 
     X = merged_data[['power','power_t']]
     y_win = merged_data[['mean_win']]
@@ -42,8 +45,9 @@ def predictOdds(team1_id,team2_id):
 
     #Gambling Strategy
     if y2 - y1 > y1*0.7:
-        y2 = y2*2.5
-        y3 = y3*3.5
+        y1 = y1*0.8
+        y2 = y2*2
+        y3 = y3*3
 
     print("----------------------")
     print("Win  = %.3f" % y1)
@@ -83,11 +87,11 @@ def predictOdds(team1_id,team2_id):
     y2=y2.sum()
     y3=y3.sum()
     predict_result = [y1,y2,y3]
-    
+
     return predict_result
 
 if __name__ == '__main__':
-    predictOdds(9864,8306)
+    predictOdds(8634,8315)
 
 
 
