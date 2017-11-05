@@ -57,5 +57,36 @@ def predict(teamX, teamY):
     return json.dumps(data)
 
 
+@app.route('/match')
+def match():
+    c = conn.cursor()
+    sql = "select player_api_id, overall_rating from Player_Attributes;"
+    c.execute(sql)
+    rs = c.fetchall()
+    d = {}
+    for r in rs:
+        d[r[0]] = r[1]
+
+    sql = "select home_team_goal-away_team_goal, {0}, {1} from match where ({2} and {3});".format(
+        ",".join(map((lambda i: "home_player_%s" % i), range(1, 12))),
+        ",".join(map((lambda i: "away_player_%s" % i), range(1, 12))),
+        " and ".join(map((lambda i: "home_player_%s is not null" % i), range(1, 12))),
+        " and ".join(map((lambda i: "away_player_%s is not null" % i), range(1, 12))),
+        )
+    print("sql:" + sql)
+    c.execute(sql)
+    ms = c.fetchall()
+    xs = []
+    for m in ms:
+        x = list(m)
+        for i in range(1, 23):
+            if d[m[i]] is None:
+                break
+            x.append(d[m[i]])
+        else:
+            xs.append(x)
+    return json.dumps(xs)
+
+
 if __name__ == "__main__":
     app.run()
