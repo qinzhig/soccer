@@ -5,7 +5,7 @@ from pandas import Series, DataFrame
 
 def getOddsHistoryByTeam(team1_id,team2_id):
     db_con = sqlite3.connect("database.sqlite")
-    Liga_match_history = pd.read_sql_query("select season,home_team_api_id,away_team_api_id,B365H,B365D,B365A from Match where home_team_api_id= " + team1_id + " and away_team_api_id= " + team2_id,db_con)
+    Liga_match_history = pd.read_sql_query("select season,home_team_api_id,away_team_api_id,B365H,B365D,B365A from Match where home_team_api_id= %s  and away_team_api_id= %s"  % (team1_id,team2_id), db_con)
     season_list = ['2015/2016']
     Liga_match_history = Liga_match_history[Liga_match_history.season.isin(season_list)]
 

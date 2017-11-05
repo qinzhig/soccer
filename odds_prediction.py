@@ -1,6 +1,7 @@
 import sqlite3
 import pandas as pd
 from sklearn import svm
+import numpy as np
 from sklearn.utils import shuffle
 from sklearn.model_selection import train_test_split
 
@@ -78,11 +79,15 @@ def predictOdds(team1_id,team2_id):
     print("LR Draw Accuracy = %.3f" % result_accuracy(y_gap_draw, 0.6))
     print("LR Lose Accuracy = %.3f" % result_accuracy(y_gap_lose, 1.5))
 
+    y1=y1.sum()
+    y2=y2.sum()
+    y3=y3.sum()
     predict_result = [y1,y2,y3]
+    
     return predict_result
 
 if __name__ == '__main__':
-    predictOdds("9864","8306")
+    predictOdds(9864,8306)
 
 
 
