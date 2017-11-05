@@ -43,6 +43,25 @@ $(function () {
             $("#lose").html(data.score[2].toFixed(2))
         })
 
+        $.getJSON("/player/team/" + home + "-" + away, function (data) {
+            html = []
+            function s(x,y){
+                if (x[1] == "GK"){
+                    return 1
+                }
+                if (y[1] == "GK"){
+                    return -1
+                }
+                return (x[1] > y[1])?1:-1
+            }
+            data[0]=data[0].sort(s)
+            data[1]=data[1].sort(s)
+            
+            for (var i = 0; i < 11; i++) {
+                html.push("<tr><td>"+data[0][i][1]+" : "+data[0][i][2]+"</td><td>"+data[1][i][1]+" : "+data[1][i][2]+"</td></tr>")
+            }
+            $("#tab_players").html(html.join(""))
+        })
     })
     $("#score").click(function () {
         $("#score").hide()
