@@ -2,6 +2,7 @@
 
 import json
 import sqlite3
+from collections import Counter
 from flask import Flask
 from odds_prediction import predictOdds
 
@@ -35,43 +36,55 @@ def team_league(id):
 @app.route('/player/team/<int:teamX>-<int:teamY>')
 def player_team(teamX, teamY):
     c = conn.cursor()
-    sql = "select {0}, {1} from match where (home_team_api_id = {2} and away_team_api_id = {3}) or (home_team_api_id = {3} and away_team_api_id = {2});".format(
-        ",".join(map((lambda i: "home_player_%s" % i), range(1, 12))),
-        ",".join(map((lambda i: "away_player_%s" % i), range(1, 12))),
-        teamX, teamY)
-    print("sql:" + sql)
-    c.execute(sql)
-    ms = c.fetchall()
-    ps = [p for y in ms for p in y]
-    c = conn.cursor()
-    print ps
-    columns = "player_fifa_api_id,player_api_id,date,overall_rating,potential,preferred_foot,attacking_work_rate,defensive_work_rate,crossing,finishing,heading_accuracy,short_passing,volleys,dribbling,curve,free_kick_accuracy,long_passing,ball_control,acceleration,sprint_speed,agility,reactions,balance,shot_power,jumping,stamina,strength,long_shots,aggression,interceptions,positioning,vision,penalties,marking,standing_tackle,sliding_tackle,gk_diving,gk_handling,gk_kicking,gk_positioning,gk_reflexes"
-    sql = "select * from Player_Attributes where {0} and {1} and id in (select id from Player_Attributes where player_api_id in ({2}) group by player_api_id having max(date)=date);".format(
-        " and ".join(map((lambda i: "%s is not null" %
-                          i), columns.split(","))),
-        ' preferred_foot in ("left","right") and attacking_work_rate in ("low","medium","high") and defensive_work_rate in ("low","medium","high")',
-        ",".join(map(lambda p: str(p), ps)),
-    )
-    print("sql:" + sql)
-    c.execute(sql)
-    ps = c.fetchall()
-    xs = []
-    foot = {
-        "left": 0,
-        "right": 1
-    }
-    level = {
-        "low": 0,
-        "medium": 1,
-        "high": 2
-    }
-    for p in ps:
-        x = list(p)
-        x[6] = foot[p[6]]
-        x[7] = level[p[7]]
-        x[8] = level[p[8]]
-        xs.append(x)
-    return json.dumps(xs)
+
+    ts = ["home","away"]
+    tps = []
+    for t in ts:
+        sql = "select {0} from match where (home_team_api_id = {1} and away_team_api_id = {2}) or (home_team_api_id = {2} and away_team_api_id = {1});".format(
+            ",".join(map((lambda i: t + "_player_%s" % i), range(1, 12))),
+            teamX, teamY)
+        print("sql:" + sql)
+        c.execute(sql)
+        ms = c.fetchall()
+        pids = [p for y in ms for p in y]
+        c = conn.cursor()
+        print "raw players: %s" % pids
+
+        cnt = Counter()
+        for pid in pids:
+            cnt[pid] += 1
+
+        pids = [e[0] for e in cnt.most_common(11)]
+        print "11 players: %s" % pids
+
+        columns = "player_fifa_api_id,player_api_id,date,overall_rating,potential,preferred_foot,attacking_work_rate,defensive_work_rate,crossing,finishing,heading_accuracy,short_passing,volleys,dribbling,curve,free_kick_accuracy,long_passing,ball_control,acceleration,sprint_speed,agility,reactions,balance,shot_power,jumping,stamina,strength,long_shots,aggression,interceptions,positioning,vision,penalties,marking,standing_tackle,sliding_tackle,gk_diving,gk_handling,gk_kicking,gk_positioning,gk_reflexes"
+        sql = "select * from Player_Attributes where {0} and {1} and id in (select id from Player_Attributes where player_api_id in ({2}) group by player_api_id having max(date)=date);".format(
+            " and ".join(map((lambda i: "%s is not null" %
+                            i), columns.split(","))),
+            ' preferred_foot in ("left","right") and attacking_work_rate in ("low","medium","high") and defensive_work_rate in ("low","medium","high")',
+            ",".join(map(lambda p: str(p), pids)),
+        )
+        print("sql:" + sql)
+        c.execute(sql)
+        ps = c.fetchall()
+        xs = []
+        foot = {
+            "left": 0,
+            "right": 1
+        }
+        level = {
+            "low": 0,
+            "medium": 1,
+            "high": 2
+        }
+        for p in ps:
+            x = list(p)
+            x[6] = foot[p[6]]
+            x[7] = level[p[7]]
+            x[8] = level[p[8]]
+            xs.append(x)
+        tps.append(xs)
+    return json.dumps(tps)
 
 
 @app.route('/predict/<int:teamX>-<int:teamY>')
