@@ -3,6 +3,7 @@
 import json
 import sqlite3
 from flask import Flask
+from odds_prediction import predictOdds
 
 app = Flask(__name__, static_url_path='/static')
 conn = sqlite3.connect('database.sqlite')
@@ -45,8 +46,10 @@ def player_team(teamX, teamY):
 
 @app.route('/predict/<int:teamX>-<int:teamY>')
 def predict(teamX, teamY):
+    result = predictOdds(teamX,teamY)
+    
     data = {
-        "score":  "%s : %s" % (teamX, teamY)
+        "score":  result
     }
     return json.dumps(data)
 
