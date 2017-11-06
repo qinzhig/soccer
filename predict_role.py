@@ -150,6 +150,6 @@ def predict_role(ps):
 
 	predicted = clf_tree.predict(predict_data)
 	#pd.value_counts(predicted)
-	print predicted
-	print type(predicted)
+	print(predicted)
+	print(type(predicted))
 	return predicted.tolist()

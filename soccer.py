@@ -46,8 +46,8 @@ def sel_player_team(X, Y):
 @app.route('/player/team/<int:teamX>-<int:teamY>/<Xline>/<Yline>')
 def player_team(teamX, teamY, Xline, Yline):
     c = conn.cursor()
-    x_line = Xline.split("_")[::-1]
-    y_line = Yline.split("_")[::-1]
+    x_line = Xline.split("_")
+    y_line = Yline.split("_")
 
 
     ts = [(teamX,teamY),(teamY,teamX)]
@@ -73,6 +73,8 @@ def player_team(teamX, teamY, Xline, Yline):
 
         pids = [e[0] for e in cnt.most_common()]
         print("%s 11 players: %s" % (t[0],pids))
+        pids = [i for i in pids if i != None]
+        print("length : "+str(len(pids)))
 
         columns = "player_fifa_api_id,player_api_id,date,overall_rating,potential,preferred_foot,attacking_work_rate,defensive_work_rate,crossing,finishing,heading_accuracy,short_passing,volleys,dribbling,curve,free_kick_accuracy,long_passing,ball_control,acceleration,sprint_speed,agility,reactions,balance,shot_power,jumping,stamina,strength,long_shots,aggression,interceptions,positioning,vision,penalties,marking,standing_tackle,sliding_tackle,gk_diving,gk_handling,gk_kicking,gk_positioning,gk_reflexes"
         sql = "select * from Player_Attributes where {0} and {1} and id in (select id from Player_Attributes where player_api_id in ({2}) group by player_api_id having max(date)=date);".format(
@@ -94,15 +96,21 @@ def player_team(teamX, teamY, Xline, Yline):
             "medium": 1,
             "high": 2
         }
+
+        pids2 = []
         for p in ps:
             x = list(p)
             x[6] = foot[p[6]]
             x[7] = level[p[7]]
             x[8] = level[p[8]]
             xs.append(x)
+            pids2.append(x[2])
 
+        pids = pids2
+
+        print("After SQL number of PIDS : " + str(len(pids2)))
         rs = predict_role(xs)
-        print("original rs: " + str(index) +" : " + str(rs))
+        print("original rs: " + str(index) +" : " + str(rs)+ ": rs length :" + str(len(rs)))
 
         ls=[]
         ps=[]
@@ -110,10 +118,7 @@ def player_team(teamX, teamY, Xline, Yline):
         MDnum = int(tl[index][1])
         DFnum = int(tl[index][2])
         a, m, d, g = 0, 0, 0, 0
-        print "len:%s %s"%(len(pids),len(rs))
         for index2,i in enumerate(pids):
-            if index2 >= len(rs):
-                break
             if rs[index2] == 'GK' and g < 1:
                 ls.append(i)
                 ps.append(rs[index2])
@@ -209,8 +214,8 @@ def predict(teamX, teamY):
         data = {
             "odds":  odds
         }
-    data["gap"] = predictGap(teamX,teamY,odds+tps[0]+tps[1])
-    data["score"] = predictScore(teamX,teamY)
+    data["gap"] = predictGap(odds+tps[0]+tps[1])
+
     return json.dumps(data)
 
 @app.route('/match')
