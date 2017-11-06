@@ -35,6 +35,10 @@ $(function () {
         var home = $("#ddl_team_home").val()
         var away = $("#ddl_team_away").val()
 
+        var home_lineup = $("#ddl_lineup_home").val()
+        var away_lineup = $("#ddl_lineup_away").val()
+
+
         clean()
 
         $.getJSON("/predict/" + home + "-" + away, function (data) {
@@ -43,7 +47,7 @@ $(function () {
             $("#lose").html(data.odds[2].toFixed(2))
         })
 
-        $.getJSON("/player/team/" + home + "-" + away, function (data) {
+        $.getJSON("/player/team/" + home + "-" + away + "/" + home_lineup + "/" + away_lineup, function (data) {
             html = []
             function s(x,y){
                 if (x[1] == "GK"){

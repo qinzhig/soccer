@@ -43,27 +43,36 @@ def sel_player_team(X, Y):
         X, Y)
     return sql
 
-@app.route('/player/team/<int:teamX>-<int:teamY>')
-def player_team(teamX, teamY):
+@app.route('/player/team/<int:teamX>-<int:teamY>/<Xline>/<Yline>')
+def player_team(teamX, teamY, Xline, Yline):
     c = conn.cursor()
+    x_line = Xline.split("_")
+    y_line = Yline.split("_")
+
 
     ts = [(teamX,teamY),(teamY,teamX)]
+    tl = [x_line,y_line]
     tps = []
-    for t in ts:
+
+    for index, t in enumerate(ts):
         sql = sel_player_team(*t)
         print("sql:" + sql)
         c.execute(sql)
         ms = c.fetchall()
+
         pids = [p for y in ms for p in y]
+
+        print(str(index) + " : " + str(tl[index]))
+
         c = conn.cursor()
-        print "%s raw players: %s" % (t[0],pids)
+        print("%s raw players: %s" % (t[0],pids))
 
         cnt = Counter()
         for pid in pids:
             cnt[pid] += 1
 
-        pids = [e[0] for e in cnt.most_common(11)]
-        print "%s 11 players: %s" % (t[0],pids)
+        pids = [e[0] for e in cnt.most_common()]
+        print("%s 11 players: %s" % (t[0],pids))
 
         columns = "player_fifa_api_id,player_api_id,date,overall_rating,potential,preferred_foot,attacking_work_rate,defensive_work_rate,crossing,finishing,heading_accuracy,short_passing,volleys,dribbling,curve,free_kick_accuracy,long_passing,ball_control,acceleration,sprint_speed,agility,reactions,balance,shot_power,jumping,stamina,strength,long_shots,aggression,interceptions,positioning,vision,penalties,marking,standing_tackle,sliding_tackle,gk_diving,gk_handling,gk_kicking,gk_positioning,gk_reflexes"
         sql = "select * from Player_Attributes where {0} and {1} and id in (select id from Player_Attributes where player_api_id in ({2}) group by player_api_id having max(date)=date);".format(
@@ -72,7 +81,7 @@ def player_team(teamX, teamY):
             ' preferred_foot in ("left","right") and attacking_work_rate in ("low","medium","high") and defensive_work_rate in ("low","medium","high")',
             ",".join(map(lambda p: str(p), pids)),
         )
-        print("sql:" + sql)
+        print("predict and pick sql:" + sql)
         c.execute(sql)
         ps = c.fetchall()
         xs = []
@@ -91,16 +100,61 @@ def player_team(teamX, teamY):
             x[7] = level[p[7]]
             x[8] = level[p[8]]
             xs.append(x)
-        rs = predict_role(xs)
 
+        rs = predict_role(xs)
+        print("original rs: " + str(index) +" : " + str(rs))
+
+        ls=[]
+        ps=[]
+        ATnum = int(tl[index][0])
+        MDnum = int(tl[index][1])
+        DFnum = int(tl[index][2])
+        a, m, d, g = 0, 0, 0, 0
+        for index2,i in enumerate(pids):
+            if rs[index2] == 'GK' and g < 1:
+                ls.append(i)
+                ps.append(rs[index2])
+                g += 1
+            elif rs[index2] == 'AT' and a < ATnum:
+                ls.append(i)
+                ps.append(rs[index2])
+                a += 1
+            elif rs[index2] == 'MD' and m < MDnum:
+                ls.append(i)
+                ps.append(rs[index2])
+                m += 1
+            elif rs[index2] == 'DF' and d < DFnum:
+                ls.append(i)
+                ps.append(rs[index2])
+                d += 1
+        while len(ls) < 11:
+            for index3,i2 in enumerate(pids):
+                if i2 not in ls:
+                    if a < ATnum:
+                        ls.append(i2)
+                        ps.append('AT')
+                        a += 1
+                    elif m < MDnum:
+                        ls.append(i2)
+                        ps.append('MD')
+                        m += 1
+                    elif d < DFnum:
+                        ls.append(i2)
+                        ps.append('DF')
+                        d += 1
+
+        pids = ls
+        rs = ps
+        print("predict pids: " + str(pids))
+        print("predict rs: " + str(rs))
         sql = "select player_api_id, player_name from Player where player_api_id in ({0});".format(
             ",".join(map(lambda p: str(p), pids)),
             )
-        print("sql:" + sql)
+        print("pick player sql:" + sql)
         c.execute(sql)
         pds = c.fetchall()
         zs = []
-        print rs
+        #print(rs)
         for i in range(11):
             zs.append([pids[i], rs[i]] + [pd[1] for pd in pds if pd[0] == pids[i]])
         tps.append(zs)
@@ -121,14 +175,14 @@ def predict(teamX, teamY):
         ms = c.fetchall()
         pids = [p for y in ms for p in y]
         c = conn.cursor()
-        print "%s raw players: %s" % (t[0],pids)
+        print("%s raw players: %s" % (t[0],pids))
 
         cnt = Counter()
         for pid in pids:
             cnt[pid] += 1
 
         pids = [e[0] for e in cnt.most_common(11)]
-        print "%s 11 players: %s" % (t[0],pids)
+        print("%s 11 players: %s" % (t[0],pids))
 
         columns = "player_fifa_api_id,player_api_id,date,overall_rating,potential,preferred_foot,attacking_work_rate,defensive_work_rate,crossing,finishing,heading_accuracy,short_passing,volleys,dribbling,curve,free_kick_accuracy,long_passing,ball_control,acceleration,sprint_speed,agility,reactions,balance,shot_power,jumping,stamina,strength,long_shots,aggression,interceptions,positioning,vision,penalties,marking,standing_tackle,sliding_tackle,gk_diving,gk_handling,gk_kicking,gk_positioning,gk_reflexes"
         sql = "select overall_rating from Player_Attributes where {0} and {1} and id in (select id from Player_Attributes where player_api_id in ({2}) group by player_api_id having max(date)=date);".format(
