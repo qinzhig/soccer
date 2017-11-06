@@ -215,7 +215,8 @@ def predict(teamX, teamY):
             "odds":  odds
         }
     data["gap"] = predictGap(odds+tps[0]+tps[1])
-
+    #a=predictGap(odds+tps[0]+tps[1])
+    print("return predict"+str(data))
     return json.dumps(data)
 
 @app.route('/match')

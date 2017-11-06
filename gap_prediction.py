@@ -11,15 +11,15 @@ from gap_data import getMatchHistory
 from classifier_helper import getAccuracy, getMatrix, getReport
 
 def predictGap(ps):
-    
+    '''
     xs = getMatchHistory()
     
     #write list to the csv
     output = open("match_data.csv","wb")
     import csv
     writer = csv.writer(output)
-    writer.writerows(xs)
-    
+    #writer.writerows(xs)
+    '''
     #read csv as training data
     fd = pd.read_csv('match_data.csv',header = None)
     test_set = fd.iloc[:-1,0:1]
@@ -71,8 +71,8 @@ def predictGap(ps):
     predicted_result = clf_multiNB.predict(predicted)
     #pd.value_counts(predicted)
 
-    print predicted_result    
-    return predicted_result.tolist()
+    print(predicted_result)
+    return(predicted_result.tolist())
 
 if __name__ == '__main__':
     #[gap, H, D, A, HGK1, HP2, HP3, HP4, HP5, HP6, HP7, HP8, HP9, HP10, HP11, AGK1, AP2, AP3, AP4, AP5, AP6, AP7, AP8, AP9, AP10, AP11]
