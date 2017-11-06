@@ -61,9 +61,9 @@ $(function () {
             data[0]=data[0].sort(s)
             data[1]=data[1].sort(s)
             var fd = {
-                AT:"CF",
-                MD:"MF",
-                DF:"BF",
+                AT:"AT",
+                MD:"MD",
+                DF:"DF",
                 GK:"GK"
             }
             for (var i = 0; i < 11; i++) {

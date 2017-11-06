@@ -46,8 +46,8 @@ def sel_player_team(X, Y):
 @app.route('/player/team/<int:teamX>-<int:teamY>/<Xline>/<Yline>')
 def player_team(teamX, teamY, Xline, Yline):
     c = conn.cursor()
-    x_line = Xline.split("_")
-    y_line = Yline.split("_")
+    x_line = Xline.split("_")[::-1]
+    y_line = Yline.split("_")[::-1]
 
 
     ts = [(teamX,teamY),(teamY,teamX)]
