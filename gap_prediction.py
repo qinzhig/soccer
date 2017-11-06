@@ -64,14 +64,11 @@ def predictGap(ps):
     predict_data = predict_data.T
     print(predict_data)
 
-    print("----------------------&Label Remove&-----------------------")
     predicted = predict_data
-    print(predicted)
 
     predicted_result = clf_multiNB.predict(predicted)
-    #pd.value_counts(predicted)
-
-    print predicted_result    
+    print predicted_result
+        
     return predicted_result.tolist()
 
 if __name__ == '__main__':

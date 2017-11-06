@@ -192,7 +192,8 @@ def predict(teamX, teamY):
         pids = [e[0] for e in cnt.most_common(11)]
         print("%s 11 players: %s" % (t[0],pids))
 
-        columns = "player_fifa_api_id,player_api_id,date,overall_rating,potential,preferred_foot,attacking_work_rate,defensive_work_rate,crossing,finishing,heading_accuracy,short_passing,volleys,dribbling,curve,free_kick_accuracy,long_passing,ball_control,acceleration,sprint_speed,agility,reactions,balance,shot_power,jumping,stamina,strength,long_shots,aggression,interceptions,positioning,vision,penalties,marking,standing_tackle,sliding_tackle,gk_diving,gk_handling,gk_kicking,gk_positioning,gk_reflexes"
+        #columns = "player_fifa_api_id,player_api_id,date,overall_rating,potential,preferred_foot,attacking_work_rate,defensive_work_rate,crossing,finishing,heading_accuracy,short_passing,volleys,dribbling,curve,free_kick_accuracy,long_passing,ball_control,acceleration,sprint_speed,agility,reactions,balance,shot_power,jumping,stamina,strength,long_shots,aggression,interceptions,positioning,vision,penalties,marking,standing_tackle,sliding_tackle,gk_diving,gk_handling,gk_kicking,gk_positioning,gk_reflexes"
+        columns = "player_api_id,overall_rating"
         sql = "select overall_rating from Player_Attributes where {0} and {1} and id in (select id from Player_Attributes where player_api_id in ({2}) group by player_api_id having max(date)=date);".format(
             " and ".join(map((lambda i: "%s is not null" %
                             i), columns.split(","))),
@@ -214,6 +215,13 @@ def predict(teamX, teamY):
         data = {
             "odds":  odds
         }
+
+    for i in range(0,11 - len(tps[0])):
+        tps[0].append(sum(tps[0])/len(tps[0]))
+
+    for i in range(0,11 - len(tps[1])):
+        tps[1].append(sum(tps[0])/len(tps[0]))
+
     data["gap"] = predictGap(odds+tps[0]+tps[1])
 
     return json.dumps(data)
