@@ -7,6 +7,8 @@ from flask import Flask
 from odds_prediction import predictOdds
 from score_prediction import predictScore
 from predict_role import predict_role
+from gap_prediction import predictGap
+from score_prediction import predictScore
 
 app = Flask(__name__, static_url_path='/static')
 conn = sqlite3.connect('database.sqlite')
@@ -34,30 +36,34 @@ def team_league(id):
     c.execute("select * from team where team_api_id in (SELECT DISTINCT home_team_api_id from match where league_id=%s);" % id)
     return json.dumps(c.fetchall())
 
+def sel_player_team(X, Y):
+    sql = "select {0} from match where home_team_api_id = {2} and away_team_api_id = {3} union select {1} from match where home_team_api_id = {3} and away_team_api_id = {2}".format(
+        ",".join(map((lambda i: "home_player_%s" % i), range(1, 12))),
+        ",".join(map((lambda i: "away_player_%s" % i), range(1, 12))),
+        X, Y)
+    return sql
 
 @app.route('/player/team/<int:teamX>-<int:teamY>')
 def player_team(teamX, teamY):
     c = conn.cursor()
 
-    ts = ["home","away"]
+    ts = [(teamX,teamY),(teamY,teamX)]
     tps = []
     for t in ts:
-        sql = "select {0} from match where (home_team_api_id = {1} and away_team_api_id = {2}) or (home_team_api_id = {2} and away_team_api_id = {1});".format(
-            ",".join(map((lambda i: t + "_player_%s" % i), range(1, 12))),
-            teamX, teamY)
+        sql = sel_player_team(*t)
         print("sql:" + sql)
         c.execute(sql)
         ms = c.fetchall()
         pids = [p for y in ms for p in y]
         c = conn.cursor()
-        print "raw players: %s" % pids
+        print "%s raw players: %s" % (t[0],pids)
 
         cnt = Counter()
         for pid in pids:
             cnt[pid] += 1
 
         pids = [e[0] for e in cnt.most_common(11)]
-        print "11 players: %s" % pids
+        print "%s 11 players: %s" % (t[0],pids)
 
         columns = "player_fifa_api_id,player_api_id,date,overall_rating,potential,preferred_foot,attacking_work_rate,defensive_work_rate,crossing,finishing,heading_accuracy,short_passing,volleys,dribbling,curve,free_kick_accuracy,long_passing,ball_control,acceleration,sprint_speed,agility,reactions,balance,shot_power,jumping,stamina,strength,long_shots,aggression,interceptions,positioning,vision,penalties,marking,standing_tackle,sliding_tackle,gk_diving,gk_handling,gk_kicking,gk_positioning,gk_reflexes"
         sql = "select * from Player_Attributes where {0} and {1} and id in (select id from Player_Attributes where player_api_id in ({2}) group by player_api_id having max(date)=date);".format(
@@ -85,22 +91,70 @@ def player_team(teamX, teamY):
             x[7] = level[p[7]]
             x[8] = level[p[8]]
             xs.append(x)
-        tps.append(predict_role(xs))
+        rs = predict_role(xs)
+
+        sql = "select player_api_id, player_name from Player where player_api_id in ({0});".format(
+            ",".join(map(lambda p: str(p), pids)),
+            )
+        print("sql:" + sql)
+        c.execute(sql)
+        pds = c.fetchall()
+        zs = []
+        print rs
+        for i in range(11):
+            zs.append([pids[i], rs[i]] + [pd[1] for pd in pds if pd[0] == pids[i]])
+        tps.append(zs)
     return json.dumps(tps)
 
 
 @app.route('/predict/<int:teamX>-<int:teamY>')
 def predict(teamX, teamY):
+    odds = predictOdds(teamX, teamY)
+    c = conn.cursor()
+
+    ts = [(teamX,teamY),(teamY,teamX)]
+    tps = []
+    for t in ts:
+        sql = sel_player_team(*t)
+        print("sql:" + sql)
+        c.execute(sql)
+        ms = c.fetchall()
+        pids = [p for y in ms for p in y]
+        c = conn.cursor()
+        print "%s raw players: %s" % (t[0],pids)
+
+        cnt = Counter()
+        for pid in pids:
+            cnt[pid] += 1
+
+        pids = [e[0] for e in cnt.most_common(11)]
+        print "%s 11 players: %s" % (t[0],pids)
+
+        columns = "player_fifa_api_id,player_api_id,date,overall_rating,potential,preferred_foot,attacking_work_rate,defensive_work_rate,crossing,finishing,heading_accuracy,short_passing,volleys,dribbling,curve,free_kick_accuracy,long_passing,ball_control,acceleration,sprint_speed,agility,reactions,balance,shot_power,jumping,stamina,strength,long_shots,aggression,interceptions,positioning,vision,penalties,marking,standing_tackle,sliding_tackle,gk_diving,gk_handling,gk_kicking,gk_positioning,gk_reflexes"
+        sql = "select overall_rating from Player_Attributes where {0} and {1} and id in (select id from Player_Attributes where player_api_id in ({2}) group by player_api_id having max(date)=date);".format(
+            " and ".join(map((lambda i: "%s is not null" %
+                            i), columns.split(","))),
+            ' preferred_foot in ("left","right") and attacking_work_rate in ("low","medium","high") and defensive_work_rate in ("low","medium","high")',
+            ",".join(map(lambda p: str(p), pids)),
+        )
+        print("sql:" + sql)
+        c.execute(sql)
+        ps = c.fetchall()
+        ps = [b[0] for b in ps]
+        print("ps:%s" % ps)
+        tps.append(ps)
+
     if teamX == teamY:
         data = {
-            "score":  [0, 1, 0]
+            "odds":  [0, 1, 0]
         }
     else:
         data = {
-            "score":  predictOdds(teamX, teamY)
+            "odds":  odds
         }
+    data["gap"] = predictGap(teamX,teamY,odds+tps[0]+tps[1])
+    data["score"] = predictScore(teamX,teamY)
     return json.dumps(data)
-
 
 @app.route('/match')
 def match():
