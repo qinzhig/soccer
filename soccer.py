@@ -223,7 +223,8 @@ def predict(teamX, teamY):
         tps[1].append(sum(tps[0])/len(tps[0]))
 
     data["gap"] = predictGap(odds+tps[0]+tps[1])
-
+    #a=predictGap(odds+tps[0]+tps[1])
+    print("return predict"+str(data))
     return json.dumps(data)
 
 @app.route('/match')

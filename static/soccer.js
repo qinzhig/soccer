@@ -42,9 +42,21 @@ $(function () {
         clean()
 
         $.getJSON("/predict/" + home + "-" + away, function (data) {
-            $("#win").html(data.odds[0].toFixed(2))
-            $("#draw").html(data.odds[1].toFixed(2))
-            $("#lose").html(data.odds[2].toFixed(2))
+            $("#win").html(data["odds"][0].toFixed(2))
+            $("#draw").html(data["odds"][1].toFixed(2))
+            $("#lose").html(data["odds"][2].toFixed(2))
+            if(data["gap"][0]=="HOME"){
+                 $("#home_result").html("WIN")
+                 $("#away_result").html("LOSE")
+            }
+            else if(data["gap"][0]=="AWAY"){
+                 $("#home_result").html("LOSE")
+                 $("#away_result").html("WIN")
+            }
+            else{
+                $("#home_result").html("DRAW")
+                $("#away_result").html("DRAW")
+            }
         })
 
         $.getJSON("/player/team/" + home + "-" + away + "/" + home_lineup + "/" + away_lineup, function (data) {
