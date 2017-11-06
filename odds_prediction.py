@@ -17,14 +17,15 @@ def predictOdds(team1_id,team2_id):
     #Shuffle and Slice Data for feeding the model
     #merged_data = shuffle(merged_data)
 
-    X = merged_data[['power','power_t']]
+    X = merged_data[['power','power_t','power_gap']]
+    #X = merged_data[['power_gap']]
     y_win = merged_data[['mean_win']]
     y_draw = merged_data[['mean_draw']]
     y_lose = merged_data[['mean_lose']]
 
-    X_train_win, X_test_win, y_train_win, y_test_win = train_test_split(X, y_win, test_size=0.2)
-    X_train_draw, X_test_draw, y_train_draw, y_test_draw = train_test_split(X, y_draw, test_size=0.2)
-    X_train_lose, X_test_lose, y_train_lose, y_test_lose = train_test_split(X, y_lose, test_size=0.2)
+    X_train_win, X_test_win, y_train_win, y_test_win = train_test_split(X, y_win, test_size=0.1)
+    X_train_draw, X_test_draw, y_train_draw, y_test_draw = train_test_split(X, y_draw, test_size=0.1)
+    X_train_lose, X_test_lose, y_train_lose, y_test_lose = train_test_split(X, y_lose, test_size=0.1)
 
     team_data = getTeamsPower(team1_id,team2_id)
 
@@ -39,15 +40,22 @@ def predictOdds(team1_id,team2_id):
     b_y3 = predictByARDRegression(X_train_lose,team_data,y_train_lose)
 
     #Ensemble model using voting with corresponding accuracy weight
-    y1 = (a_y1*1 + b_y1*0)/1
-    y2 = (a_y2*1 + b_y2*0)/1
-    y3 = (a_y3*2 + b_y3*1)/3
+    y1 = (a_y1*4 + b_y1*1)/5
+    y2 = (a_y2*4 + b_y2*1)/5
+    y3 = (a_y3*4 + b_y3*1)/5
 
     #Gambling Strategy
-    if y2 - y1 > y1*0.7:
-        y1 = y1*0.8
-        y2 = y2*2
-        y3 = y3*3
+    if y2 - y3 > y2 -y1:
+        y1 = y1 * 1.8
+        y2 = y2 * 1.2
+        if y3 > 1.5:
+            y3 = y3 * 0.8
+    elif y2 > (y2 - y1)*1.2:
+        y2 = y2*1.8
+        y3 = y3*2.5
+        if y1 > 1.5:
+            y1 = y1*0.8
+
 
     print("----------------------")
     print("Win  = %.3f" % y1)
@@ -66,9 +74,9 @@ def predictOdds(team1_id,team2_id):
     y_gap_draw = predictGAP(y_test_predict_draw,y_test_draw)
     y_gap_lose = predictGAP(y_test_predict_lose,y_test_lose)
 
-    print("SVM Win  Accuracy = %.3f" % result_accuracy(y_gap_win, 0.4))
-    print("SVM Draw Accuracy = %.3f" % result_accuracy(y_gap_draw, 0.6))
-    print("SVM Lose Accuracy = %.3f" % result_accuracy(y_gap_lose, 1.5))
+    print("SVM Win  Accuracy = %.3f" % result_accuracy(y_gap_win, 0.5))
+    print("SVM Draw Accuracy = %.3f" % result_accuracy(y_gap_draw, 0.8))
+    print("SVM Lose Accuracy = %.3f" % result_accuracy(y_gap_lose, 2.0))
 
     #Predict using Linear Regression model
     y_test_predict_win  = predictByARDRegression(X_train_win,X_test_win,y_train_win)
@@ -79,9 +87,9 @@ def predictOdds(team1_id,team2_id):
     y_gap_draw = predictGAP(y_test_predict_draw,y_test_draw)
     y_gap_lose = predictGAP(y_test_predict_lose,y_test_lose)
 
-    print("LR Win  Accuracy = %.3f" % result_accuracy(y_gap_win, 0.4))
-    print("LR Draw Accuracy = %.3f" % result_accuracy(y_gap_draw, 0.6))
-    print("LR Lose Accuracy = %.3f" % result_accuracy(y_gap_lose, 1.5))
+    print("LR Win  Accuracy = %.3f" % result_accuracy(y_gap_win, 0.5))
+    print("LR Draw Accuracy = %.3f" % result_accuracy(y_gap_draw, 0.8))
+    print("LR Lose Accuracy = %.3f" % result_accuracy(y_gap_lose, 2.0))
 
     y1=y1.sum()
     y2=y2.sum()
@@ -91,7 +99,7 @@ def predictOdds(team1_id,team2_id):
     return predict_result
 
 if __name__ == '__main__':
-    predictOdds(8634,8315)
+    predictOdds(9906,8370)
 
 
 

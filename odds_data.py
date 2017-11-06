@@ -49,6 +49,12 @@ def getTeamsPower(team1_id,team2_id):
     result = new_df[['power']]
     result = result.T
 
+    result['power_gap'] = (result.iloc[:,0] - result.iloc[:,1]) * 10
+
+    print("Power Gap = %s" % result)
+
+    #result = result[['power_gap']]
+
     return result
 
 #@Description: Function for show up the Spanish League Team data details
@@ -115,7 +121,7 @@ def getOddsDataForSpanish():
     teams_prop = teams_prop.merge(spain_teams, left_on="team_api_id", right_on="team_api_id", suffixes=('', '_t'))
     teams_prop = teams_prop[['team_api_id','team_short_name','buildUpPlaySpeed','chanceCreationPassing','chanceCreationCrossing','chanceCreationShooting', 'defencePressure','defenceAggression','defenceTeamWidth']]
 
-    teams_prop['power'] = teams_prop['buildUpPlaySpeed'] +teams_prop['chanceCreationShooting'] + teams_prop['defenceAggression']
+    teams_prop['power'] = teams_prop['buildUpPlaySpeed'] +teams_prop['chanceCreationShooting'] + teams_prop['defencePressure'] + teams_prop['defenceAggression'] + teams_prop['defenceTeamWidth']
     #print(teams_prop)
 
     #Data concating
@@ -127,6 +133,8 @@ def getOddsDataForSpanish():
 
     func1 = lambda x: (x - x.min()) / (x.max() - x.min())
     power_data = power_data.apply(func1)
+
+    power_data['power_gap'] = (power_data['power'] - power_data['power_t'])*10
 
     odds_data_win = matches_win[['mean_win']]
     odds_data_draw = matches_win[['mean_draw']]
