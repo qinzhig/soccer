@@ -40,6 +40,19 @@ def predictGAP(y_predict,y_actual):
     y_gap = y_predict - y_actual.values.ravel()
 
     return y_gap
+def setBettingStrategy(y1,y2,y3):
+    if y2 - y3 > y2 -y1:
+        y1 = y1 * 1.8
+        y2 = y2 * 1.2
+        if y3 > 1.5:
+            y3 = y3 * 0.8
+    elif y2 > (y2 - y1)*1.2:
+        y2 = y2*1.8
+        y3 = y3*2.5
+        if y1 > 1.5:
+            y1 = y1*0.8
+
+    return y1,y2,y3
 
 # Prediction accuracy caculation Function for the test dataset
 def result_accuracy(result,var):

@@ -6,7 +6,7 @@ from sklearn.utils import shuffle
 from sklearn.model_selection import train_test_split
 
 from odds_data import getOddsDataForSpanish,getTeamsPower,getOddsHistoryByTeam
-from model_helper import predictBySVM,predictByARDRegression,predictByLR,predictGAP,result_accuracy
+from model_helper import predictBySVM,predictByARDRegression,predictByLR,predictGAP,result_accuracy,setBettingStrategy
 
 #@Author:   Qin Zhi Guo
 #@Version:  1.0
@@ -45,17 +45,7 @@ def predictOdds(team1_id,team2_id):
     y3 = (a_y3*4 + b_y3*1)/5
 
     #Gambling Strategy
-    if y2 - y3 > y2 -y1:
-        y1 = y1 * 1.8
-        y2 = y2 * 1.2
-        if y3 > 1.5:
-            y3 = y3 * 0.8
-    elif y2 > (y2 - y1)*1.2:
-        y2 = y2*1.8
-        y3 = y3*2.5
-        if y1 > 1.5:
-            y1 = y1*0.8
-
+    y1,y2,y3 = setBettingStrategy(y1,y2,y3)
 
     print("----------------------")
     print("Win  = %.3f" % y1)
@@ -99,7 +89,7 @@ def predictOdds(team1_id,team2_id):
     return predict_result
 
 if __name__ == '__main__':
-    predictOdds(9906,8370)
+    predictOdds(8634,8370)
 
 
 
