@@ -49,20 +49,25 @@ $(function () {
 
         $.getJSON("/player/team/" + home + "-" + away + "/" + home_lineup + "/" + away_lineup, function (data) {
             html = []
+            var sd = {
+                AT:1,
+                MD:2,
+                DF:3,
+                GK:4
+            }
             function s(x,y){
-                if (x[1] == "GK"){
-                    return 1
-                }
-                if (y[1] == "GK"){
-                    return -1
-                }
-                return (x[1] > y[1])?1:-1
+                return sd[x[1]] - sd[y[1]]
             }
             data[0]=data[0].sort(s)
             data[1]=data[1].sort(s)
-            
+            var fd = {
+                AT:"CF",
+                MD:"MF",
+                DF:"BF",
+                GK:"GK"
+            }
             for (var i = 0; i < 11; i++) {
-                html.push("<tr><td>"+data[0][i][1]+" : "+data[0][i][2]+"</td><td>"+data[1][i][1]+" : "+data[1][i][2]+"</td></tr>")
+                html.push("<tr><td>"+fd[data[0][i][1]]+" : "+data[0][i][2]+"</td><td>"+fd[data[1][i][1]]+" : "+data[1][i][2]+"</td></tr>")
             }
             $("#tab_players").html(html.join(""))
         })
