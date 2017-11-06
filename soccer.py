@@ -46,8 +46,8 @@ def sel_player_team(X, Y):
 @app.route('/player/team/<int:teamX>-<int:teamY>/<Xline>/<Yline>')
 def player_team(teamX, teamY, Xline, Yline):
     c = conn.cursor()
-    x_line = Xline.split("_")
-    y_line = Yline.split("_")
+    x_line = Xline.split("_")[::-1]
+    y_line = Yline.split("_")[::-1]
 
 
     ts = [(teamX,teamY),(teamY,teamX)]
@@ -110,7 +110,10 @@ def player_team(teamX, teamY, Xline, Yline):
         MDnum = int(tl[index][1])
         DFnum = int(tl[index][2])
         a, m, d, g = 0, 0, 0, 0
+        print "len:%s %s"%(len(pids),len(rs))
         for index2,i in enumerate(pids):
+            if index2 >= len(rs):
+                break
             if rs[index2] == 'GK' and g < 1:
                 ls.append(i)
                 ps.append(rs[index2])
