@@ -12,7 +12,7 @@ def getMatchHistory():
     #hda = "BWH,BWD,BWA,IWH,IWD,IWA,LBH,LBD,LBA,PSH,PSD,PSA,WHH,WHD,WHA,SJH,SJD,SJA,VCH,VCD,VCA,GBH,GBD,GBA,BSH,BSD,BSA"
     hda = "BWH,BWD,BWA"
 
-    sql = "select home_team_goal-away_team_goal, {0}, {1}, {4} from match where ({2} and {3} and {5});".format(
+    sql = "select CASE WHEN home_team_goal-away_team_goal > 0 THEN 'HOME' WHEN home_team_goal-away_team_goal = 0 THEN 'DRAW' ELSE 'AWAY' END, {0}, {1}, {4} from match where ({2} and {3} and {5});".format(
         ",".join(map((lambda i: "home_player_%s" % i), range(1, 12))),
         ",".join(map((lambda i: "away_player_%s" % i), range(1, 12))),
         " and ".join(map((lambda i: "home_player_%s is not null" % i), range(1, 12))),
@@ -33,3 +33,5 @@ def getMatchHistory():
         else:
             xs.append(x)
     return xs
+
+

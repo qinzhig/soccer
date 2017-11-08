@@ -35,30 +35,51 @@ $(function () {
         var home = $("#ddl_team_home").val()
         var away = $("#ddl_team_away").val()
 
+        var home_lineup = $("#ddl_lineup_home").val()
+        var away_lineup = $("#ddl_lineup_away").val()
+
+
         clean()
 
         $.getJSON("/predict/" + home + "-" + away, function (data) {
-            $("#win").html(data.odds[0].toFixed(2))
-            $("#draw").html(data.odds[1].toFixed(2))
-            $("#lose").html(data.odds[2].toFixed(2))
+            $("#win").html(data["odds"][0].toFixed(2))
+            $("#draw").html(data["odds"][1].toFixed(2))
+            $("#lose").html(data["odds"][2].toFixed(2))
+            if(data["gap"][0]=="HOME"){
+                 $("#home_result").html("WIN")
+                 $("#away_result").html("LOSE")
+            }
+            else if(data["gap"][0]=="AWAY"){
+                 $("#home_result").html("LOSE")
+                 $("#away_result").html("WIN")
+            }
+            else{
+                $("#home_result").html("DRAW")
+                $("#away_result").html("DRAW")
+            }
         })
 
-        $.getJSON("/player/team/" + home + "-" + away, function (data) {
+        $.getJSON("/player/team/" + home + "-" + away + "/" + home_lineup + "/" + away_lineup, function (data) {
             html = []
+            var sd = {
+                AT:1,
+                MD:2,
+                DF:3,
+                GK:4
+            }
             function s(x,y){
-                if (x[1] == "GK"){
-                    return 1
-                }
-                if (y[1] == "GK"){
-                    return -1
-                }
-                return (x[1] > y[1])?1:-1
+                return sd[x[1]] - sd[y[1]]
             }
             data[0]=data[0].sort(s)
             data[1]=data[1].sort(s)
-            
+            var fd = {
+                AT:"AT",
+                MD:"MD",
+                DF:"DF",
+                GK:"GK"
+            }
             for (var i = 0; i < 11; i++) {
-                html.push("<tr><td>"+data[0][i][1]+" : "+data[0][i][2]+"</td><td>"+data[1][i][1]+" : "+data[1][i][2]+"</td></tr>")
+                html.push("<tr><td>"+fd[data[0][i][1]]+" : "+data[0][i][2]+"</td><td>"+fd[data[1][i][1]]+" : "+data[1][i][2]+"</td></tr>")
             }
             $("#tab_players").html(html.join(""))
         })
