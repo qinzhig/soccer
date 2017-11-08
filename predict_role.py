@@ -94,7 +94,7 @@ def predict_role(ps):
 	fd.label = df_obj.apply(lambda x: str(x).strip())
 	print(fd.label)
 	test_set = fd[['label']]
-	train_set = fd[['overall_rating','potential','preferred_foot','attacking_work_rate','defensive_work_rate','crossing',
+	train_set = fd[['attacking_work_rate','defensive_work_rate','crossing',
                 'finishing','heading_accuracy','short_passing','volleys','dribbling','curve','free_kick_accuracy','long_passing','ball_control','acceleration',
                 'sprint_speed','agility','reactions','balance','shot_power','jumping','stamina','strength','long_shots',
                 'aggression','interceptions','positioning','vision','penalties','marking','standing_tackle','sliding_tackle','gk_diving','gk_handling','gk_kicking','gk_positioning',
@@ -115,6 +115,8 @@ def predict_role(ps):
 	print(confusion_matrix_NB)
 	accuracy_NB = metrics.accuracy_score(y_test,predicted)
 	print(accuracy_NB)
+	print(metrics.classification_report(y_test, predicted))
+
 	print("##############################################")
 
 
@@ -143,7 +145,7 @@ def predict_role(ps):
 	print(predict_data)
 	print("----------------------&&&&&&&&&&&&&&&&&&&&&&&&&&&&&-----------------------")
 
-	predict_data = predict_data.iloc[:,4:]
+	predict_data = predict_data.iloc[:,7:]
 	print("---------------------- become 38  ----------------------------------------")
 	print(predict_data)
 	print("---------------------- become 38  ----------------------------------------")
