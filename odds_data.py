@@ -146,4 +146,5 @@ def getOddsDataForSpanish():
     format1 = lambda x: '%.3f' % x
     merged_data = merged_data.applymap(format1)
 
+
     return merged_data

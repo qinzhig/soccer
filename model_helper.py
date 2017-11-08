@@ -42,13 +42,13 @@ def predictGAP(y_predict,y_actual):
     return y_gap
 def setBettingStrategy(y1,y2,y3):
     if y2 - y3 > y2 -y1:
-        y1 = y1 * 1.8
+        y1 = y1 * 1.6
         y2 = y2 * 1.2
         if y3 > 1.5:
             y3 = y3 * 0.8
     elif y2 > (y2 - y1)*1.2:
-        y2 = y2*1.8
-        y3 = y3*2.5
+        y2 = y2*1.2
+        y3 = y3*1.6
         if y1 > 1.5:
             y1 = y1*0.8
 
