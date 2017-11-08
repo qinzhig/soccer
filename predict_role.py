@@ -106,8 +106,8 @@ def predict_role(ps):
 	x_train,x_test, y_train, y_test = train_test_split(train_set, test_set, test_size=0.33, random_state=12)
 
 	from sklearn.naive_bayes import MultinomialNB
-	clf = MultinomialNB().fit(x_train, y_train)
-	predicted = clf.predict(x_test)
+	clf_NB = MultinomialNB().fit(x_train, y_train)
+	predicted = clf_NB.predict(x_test)
 	import numpy as np
 	from sklearn import metrics 
 	print("#################### NB ######################")
@@ -115,7 +115,7 @@ def predict_role(ps):
 	print(confusion_matrix_NB)
 	accuracy_NB = metrics.accuracy_score(y_test,predicted)
 	print(accuracy_NB)
-	print(metrics.classification_report(y_test, predicted))
+#	print(metrics.classification_report(y_test, predicted))
 
 	print("##############################################")
 
@@ -125,17 +125,19 @@ def predict_role(ps):
 	predicted = clf_tree.predict(x_test)
 	print("#################### Decision Tree ######################")
 	print(metrics.confusion_matrix(y_test, predicted))
-	print(metrics.accuracy_score(y_test,predicted))
-	print(metrics.classification_report(y_test, predicted))
+	accuracy_DT = metrics.accuracy_score(y_test,predicted)
+	print(accuracy_DT)
+#	print(metrics.classification_report(y_test, predicted))
 	print("##############################################")
 
 
 	from sklearn.linear_model import SGDClassifier
-	clf = SGDClassifier().fit(x_train, y_train)
-	predicted = clf.predict(x_test)
+	clf_SGD = SGDClassifier().fit(x_train, y_train)
+	predicted = clf_SGD.predict(x_test)
 	print("#################### SGD Classifier ######################")
 	print(metrics.confusion_matrix(y_test, predicted))
-	print(metrics.accuracy_score(y_test,predicted))
+	accuracy_SGD = metrics.accuracy_score(y_test,predicted)
+	print(accuracy_SGD)
 	print("##############################################")
 
 	from pandas.core.frame import DataFrame
@@ -150,8 +152,17 @@ def predict_role(ps):
 	print(predict_data)
 	print("---------------------- become 38  ----------------------------------------")
 
-	predicted = clf_tree.predict(predict_data)
-	#pd.value_counts(predicted)
+	accuracy_list = [accuracy_NB,accuracy_DT,accuracy_SGD]
+	if max(accuracy_list) == accuracy_NB:
+		clf_model = clf_NB
+	elif max(accuracy_list) == accuracy_DT:
+		clf_model = clf_tree
+	elif max(accuracy_list) == accuracy_SGD:
+		clf_model = clf_SGD
+	predicted = clf_model.predict(predict_data)
+	print("************* model selection ****************")
+	print(clf_model)
+	pd.value_counts(predicted)
 	print(predicted)
 	print(type(predicted))
 	return predicted.tolist()
