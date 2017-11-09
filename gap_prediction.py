@@ -24,6 +24,8 @@ def predictGap(ps):
     fd = pd.read_csv('match_data.csv',header = None)
     test_set = fd.iloc[:-1,0:1]
     train_set = fd.iloc[:-1,23:]
+    print("the data used for to predict which team will win")
+    print(fd)
 
     #trainset
     from sklearn.model_selection import train_test_split
@@ -34,28 +36,34 @@ def predictGap(ps):
     clf_decisionTree = tree.DecisionTreeClassifier().fit(x_train, y_train)
     predicted = clf_decisionTree.predict(x_test)
     print(getMatrix(y_test, predicted))
-    print(getAccuracy(y_test,predicted))
+    accuracy_DT = getAccuracy(y_test,predicted)
+    #print(getAccuracy(y_test,predicted))
+    print(accuracy_DT)
+
 
     #MultinomialNB build Model
     print("######MultinomialNB######")
     clf_multiNB = MultinomialNB(alpha=1.0, class_prior=None, fit_prior=True).fit(x_train, y_train)
     predicted = clf_multiNB.predict(x_test)
     print(getMatrix(y_test, predicted))
-    print(getAccuracy(y_test,predicted))
-
+    accuracy_NB = getAccuracy(y_test,predicted)
+    print(accuracy_NB)
+    print(metrics.classification_report(y_test, predicted))
     #SGD classification
     print("######SGDClassifier######")
     clf_sgd = SGDClassifier().fit(x_train, y_train)
     predicted = clf_sgd.predict(x_test)
     print(getMatrix(y_test, predicted))
-    print(getAccuracy(y_test,predicted))
+    accuracy_SGD = getAccuracy(y_test,predicted)
+    print(accuracy_SGD)
 
     #GaussianNB model
     print("######GaussianNB######")
     clf_gaussianNB = GaussianNB().fit(x_train, y_train)
     predicted = clf_gaussianNB.predict(x_test)
     print(getMatrix(y_test, predicted))
-    print(getAccuracy(y_test,predicted))
+    accuracy_GNB = getAccuracy(y_test,predicted)
+    print(accuracy_GNB)
  
     #use the model
     print("----------------------&Predict_data&-----------------------")
@@ -66,7 +74,18 @@ def predictGap(ps):
 
     predicted = predict_data
 
-    predicted_result = clf_multiNB.predict(predicted)
+    accuracy_list = [accuracy_NB,accuracy_DT,accuracy_SGD,accuracy_GNB]
+    if max(accuracy_list) == accuracy_NB:
+        clf_model = clf_multiNB
+    elif max(accuracy_list) == accuracy_DT:
+        clf_model = clf_decisionTree
+    elif max(accuracy_list) == accuracy_SGD:
+        clf_model = clf_sgd
+    elif max(accuracy_list) == accuracy_GNB:
+        clf_model = clf_gaussianNB
+
+    predicted_result = clf_model.predict(predicted)
+    print(clf_model)
 
     print predicted_result
         
