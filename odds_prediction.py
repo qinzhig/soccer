@@ -89,7 +89,7 @@ def predictOdds(team1_id,team2_id):
     return predict_result
 
 if __name__ == '__main__':
-    predictOdds(8633,9906)
+    predictOdds(8634,8633)
 
 
 

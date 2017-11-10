@@ -122,7 +122,7 @@ def getOddsDataForSpanish():
     teams_prop = teams_prop[['team_api_id','team_short_name','buildUpPlaySpeed','chanceCreationPassing','chanceCreationCrossing','chanceCreationShooting', 'defencePressure','defenceAggression','defenceTeamWidth']]
 
     teams_prop['power'] = teams_prop['buildUpPlaySpeed'] +teams_prop['chanceCreationShooting'] + teams_prop['defencePressure'] + teams_prop['defenceAggression'] + teams_prop['defenceTeamWidth']
-    #print(teams_prop)
+    print(teams_prop)
 
     #Data concating
     matches_win = matches_win.merge(teams_prop, left_on="team_short_name", right_on="team_short_name", suffixes=('', '_t'))
